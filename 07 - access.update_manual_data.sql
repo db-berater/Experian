@@ -5,13 +5,24 @@ CREATE OR ALTER PROCEDURE access.update_manual_data
 	@processIdOriginal		BIGINT,
 	@prueferId				BIGINT,
 	@umgesetzteEinsparung	NUMERIC(12, 2),
-	@kommentar				VARCHAR(512)
+	@kommentar				VARCHAR(512),
+	@check_difference		BIT = 0
 AS
 BEGIN
 	SET NOCOUNT ON;
 	SET XACT_ABORT ON;
 
 	DECLARE	@return_value INT = 0;
+
+	/* Zunächst muss überprüft werden, ob die Einsparung größer ist als die Kosten */
+	IF EXISTS
+	(
+		SELECT * FROM dbo.vorgaenge
+		WHERE	processIdOriginal = @processIdOriginal
+				AND reparaturkostenNettoOriginal - @umgesetzteEinsparung < 0
+				AND @check_difference = 1
+	)
+		RETURN 99;	/* Dedizierter Rückgabewert für aufrufende Funktion */
 
 	IF EXISTS (SELECT * FROM dbo.manuelleEinsparungen WHERE processIdOriginal = @processIdOriginal)
 		UPDATE	dbo.manuelleEinsparungen
