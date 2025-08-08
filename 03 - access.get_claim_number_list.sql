@@ -17,31 +17,27 @@ BEGIN
 
 	SELECT	v.processIdOriginal,
 			v.versicherung						AS	Versicherung,
-			v.prozess								AS	Prozess,
+			v.prozess							AS	Prozess,
 			v.schadennummer						AS	Schadennummer,
-			v.kennzeichen							AS	Kennzeichen,
+			v.kennzeichen						AS	Kennzeichen,
 			FORMAT
 			(
 				v.eingangszeitpunktKorrektur,
 				N'dd.MM.yyyy',
 				N'de-de'
-			)									AS	[Eingang],
+			)									AS	[Eingang Korrektur],
 			FORMAT
 			(
 				v.abschlusszeitpunktKorrektur,
 				N'dd.MM.yyyy',
 				N'de-de'
-			)									AS	[Abschluﬂ],
+			)									AS	[Abschluﬂ Korrektur],
 			FORMAT
 			(
 				v.reparaturkostenNettoOriginal,
 				N'#,##0.00 Ä',
 				N'de-de'
-			)									AS	[Kosten],
-			CASE WHEN me.processIdOriginal IS NOT NULL
-					THEN 'X'
-					ELSE '-'
-			END									AS	[_]
+			)									AS	[Reparaturkosten 1. Lauf]
 	FROM	dbo.vorgaenge AS v
 			LEFT JOIN dbo.manuelleEinsparungen AS me
 			ON
